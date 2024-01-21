@@ -22,16 +22,16 @@ private:
 	int id;
 	std::mutex m;
 public:
-	Data(int data) : id(data) {}
-	int getData() { return id; }
+	Data(const int data) : id(data) {}
+	int getData() const { return id; }
 	std::mutex* getMutexPtr() { return &m; }
-	friend void swapclass(Data& lhs, Data& rhs)
+	static friend void swapclass(Data& lhs, Data& rhs)
 	{
 		std::swap(lhs.id, rhs.id);
 	}
 };
 
-void swap(Data& d1, Data& d2)
+static void swap(Data& d1, Data& d2)
 {
 	d1.getMutexPtr()->lock();
 	d2.getMutexPtr()->lock();
@@ -40,13 +40,13 @@ void swap(Data& d1, Data& d2)
 	d2.getMutexPtr()->unlock();
 }
 
-void swap2(Data& d1, Data& d2)
+static void swap2(Data& d1, Data& d2)
 {
 	std::scoped_lock sl(*d1.getMutexPtr(), *d2.getMutexPtr());
 	swapclass(d1, d2);
 }
 
-void swap3(Data& d1, Data& d2)
+static void swap3(Data& d1, Data& d2)
 {
 	std::unique_lock<std::mutex> ul1(*d1.getMutexPtr());
 	std::unique_lock<std::mutex> ul2(*d2.getMutexPtr());
